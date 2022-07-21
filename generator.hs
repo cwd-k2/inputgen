@@ -16,14 +16,13 @@ import qualified System.Random            as R
 type Generator a = State StdGen a
 
 generate :: (MonadIO m) => State StdGen a -> m a
-generate gen = evalState gen <$> R.getStdGen
+generate gen = evalState gen <$> R.initStdGen
 
-generateSeed :: (MonadIO m)
-             => Int
+generateSeed :: Int
              -> State StdGen a
-             -> m a
+             -> a
 generateSeed seed gen =
-  return (evalState gen $ R.mkStdGen seed)
+  evalState gen $ R.mkStdGen seed
 
 -- とにかくランダムに生成する
 random :: (Random a, RandomGen g) => State g a
