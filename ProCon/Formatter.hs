@@ -81,11 +81,11 @@ newline :: Formatter
 newline = char '\n'
 
 -- 以下コンビネータ
-joinWith :: Formatter -> [Formatter] -> Formatter
+joinWith :: Foldable f => Formatter -> f Formatter -> Formatter
 joinWith f = foldl1 (\l r -> l >> f >> r)
 
-mkWords :: [Formatter] -> Formatter
+mkWords :: Foldable f => f Formatter -> Formatter
 mkWords = joinWith space
 
-mkLines :: [Formatter] -> Formatter
+mkLines :: Foldable f => f Formatter -> Formatter
 mkLines = joinWith newline

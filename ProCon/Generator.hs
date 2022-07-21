@@ -33,15 +33,15 @@ range :: (Random a, RandomGen g) => (a, a) -> State g a
 range = state . R.randomR
 
 -- A-Z の 1 文字を生成する
-upper :: (RandomGen g) => State g Char
+upper :: RandomGen g => State g Char
 upper = w2c <$> state (R.randomR (0x41, 0x5a))
 
 -- a-z の 1 文字を生成する
-lower :: (RandomGen g) => State g Char
+lower :: RandomGen g => State g Char
 lower = w2c <$> state (R.randomR (0x61, 0x7a))
 
 -- 大文字か小文字のどちらかを生成
-alpha :: Generator Char
+alpha :: RandomGen g => State g Char
 alpha = do
   b <- random
   if b
@@ -49,11 +49,11 @@ alpha = do
      else lower
 
 -- 0-9 の 1 文字を生成する
-digit :: (RandomGen g) => State g Char
+digit :: RandomGen g => State g Char
 digit = w2c <$> state (R.randomR (0x30, 0x39))
 
 -- リストをランダムに並べ替える
-shuffle :: (RandomGen g)
+shuffle :: RandomGen g
         => [a]
         -> State g [a]
 shuffle a = do
@@ -63,7 +63,7 @@ shuffle a = do
   return $ snd <$> sortOn fst (zip i a)
 
 -- リストの中から適当にひとつ選ぶ
-element :: (RandomGen g) => [a] -> State g a
+element :: RandomGen g => [a] -> State g a
 element a = do
   i <- range (0, length a - 1)
   return $ a !! i
@@ -72,7 +72,7 @@ element a = do
 
 -- 条件を満たすまでデータを生成し続ける
 -- 計算量不明
-confirm :: (RandomGen g)
+confirm :: RandomGen g
         => (a -> Bool)
         -> State g a
         -> State g a
@@ -98,7 +98,7 @@ distinct n gen = go S.empty n where
     (v :) <$> go (S.insert v s) (l - 1)
 
 -- 生成器のリストの中から適当にひとつ選ぶコンビネータ
-choice :: (RandomGen g) => [State g a] -> State g a
+choice :: RandomGen g => [State g a] -> State g a
 choice gens = do
   i <- range (0, length gens - 1)
   gens !! i
