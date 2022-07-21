@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
-module Formatter
+module ProCon.Formatter
   ( Formatter
   , Formattable (..)
   , int

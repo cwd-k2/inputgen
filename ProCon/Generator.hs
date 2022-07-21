@@ -1,6 +1,6 @@
 {-# LANGUAGE RankNTypes          #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-module Generator where
+module ProCon.Generator where
 
 import           Control.Monad            (replicateM)
 import           Control.Monad.IO.Class   (MonadIO)

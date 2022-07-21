@@ -8,10 +8,10 @@ import           Control.Monad
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as BS
 
-import           Formatter             (Formattable (..))
-import qualified Formatter             as F
-import           Generator             (Generator)
-import qualified Generator             as G
+import           ProCon.Formatter      (Formattable (..))
+import qualified ProCon.Formatter      as F
+import           ProCon.Generator      (Generator)
+import qualified ProCon.Generator      as G
 
 -- サンプル：レベルアップ問題集『クエリメニュー』経理
 data Sample = Sample
@@ -21,6 +21,7 @@ data Sample = Sample
   , apm :: [(ByteString, ByteString, Int)]
   }
 
+-- 出力形式を定義する
 instance Formattable Sample where
   format Sample{..} = do
     F.int n >> F.space >> F.int k
@@ -33,6 +34,7 @@ instance Formattable Sample where
       F.bytestring a >> F.space >> F.bytestring p >> F.space >> F.int m
     F.newline
 
+-- データ生成方法を指示
 sample :: Generator Sample
 sample = do
   n <- G.range (1, 100)
