@@ -1,18 +1,33 @@
+{-# LANGUAGE RankNTypes          #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module Generator where
 
-import           Control.Monad
-import           Control.Monad.State      (State, state)
+import           Control.Monad            (replicateM)
+import           Control.Monad.IO.Class   (MonadIO)
+import           Control.Monad.State      (State, evalState, state)
 import           Data.List                (sortOn)
-import           Data.Word                (Word8)
 
-import           Data.ByteString.Char8    (ByteString)
-import qualified Data.ByteString.Char8    as BS
 import           Data.ByteString.Internal (w2c)
 import qualified Data.Set                 as S
 
-import           System.Random            (Random, RandomGen)
+import           System.Random            (Random, RandomGen, StdGen)
 import qualified System.Random            as R
+
+type Generator a = State StdGen a
+
+generate :: (MonadIO m) => State StdGen a -> m a
+generate gen = evalState gen <$> R.getStdGen
+
+generateSeed :: (MonadIO m)
+             => Int
+             -> State StdGen a
+             -> m a
+generateSeed seed gen =
+  return (evalState gen $ R.mkStdGen seed)
+
+-- とにかくランダムに生成する
+random :: (Random a, RandomGen g) => State g a
+random = state R.random
 
 -- 範囲を指定して整数・文字等を生成する
 between :: (Random a, RandomGen g) => (a, a) -> State g a
@@ -25,6 +40,14 @@ upper = w2c <$> state (R.randomR (0x41, 0x5a))
 -- a-z の 1 文字を生成する
 lower :: (RandomGen g) => State g Char
 lower = w2c <$> state (R.randomR (0x61, 0x7a))
+
+-- 大文字か小文字のどちらかを生成
+alpha :: Generator Char
+alpha = do
+  b <- random
+  if b
+     then upper
+     else lower
 
 -- 0-9 の 1 文字を生成する
 digit :: (RandomGen g) => State g Char
@@ -46,8 +69,10 @@ element a = do
   i <- between (0, length a - 1)
   return $ a !! i
 
--- 条件を満たす乱数生成器を作るコンビネータ
--- 条件を満たすまで生成し続けるので計算量不明
+-- 以下コンビネータ
+
+-- 条件を満たすまでデータを生成し続ける
+-- 計算量不明
 confirm :: (RandomGen g)
         => (a -> Bool)
         -> State g a
@@ -78,10 +103,3 @@ choice :: (RandomGen g) => [State g a] -> State g a
 choice gens = do
   i <- between (0, length gens - 1)
   gens !! i
-
--- 長さと文字生成器を指定して文字列を生成するコンビネータ
-bytestring :: (RandomGen g)
-           => Int
-           -> State g Char
-           -> State g ByteString
-bytestring n gen = BS.pack <$> replicateM n gen
