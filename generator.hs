@@ -30,8 +30,8 @@ random :: (Random a, RandomGen g) => State g a
 random = state R.random
 
 -- 範囲を指定して整数・文字等を生成する
-between :: (Random a, RandomGen g) => (a, a) -> State g a
-between = state . R.randomR
+range :: (Random a, RandomGen g) => (a, a) -> State g a
+range = state . R.randomR
 
 -- A-Z の 1 文字を生成する
 upper :: (RandomGen g) => State g Char
@@ -66,7 +66,7 @@ shuffle a = do
 -- リストの中から適当にひとつ選ぶ
 element :: (RandomGen g) => [a] -> State g a
 element a = do
-  i <- between (0, length a - 1)
+  i <- range (0, length a - 1)
   return $ a !! i
 
 -- 以下コンビネータ
@@ -101,5 +101,5 @@ distinct n gen = go S.empty n where
 -- 生成器のリストの中から適当にひとつ選ぶコンビネータ
 choice :: (RandomGen g) => [State g a] -> State g a
 choice gens = do
-  i <- between (0, length gens - 1)
+  i <- range (0, length gens - 1)
   gens !! i

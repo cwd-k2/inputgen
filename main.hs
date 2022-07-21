@@ -18,19 +18,19 @@ data Sample = Sample
 
 sample :: Generator Sample
 sample = do
-  n <- between (1, 20)
-  k <- between (1, 20)
+  n <- range (1, 20)
+  k <- range (1, 20)
 
   s <- distinct n $ do
-    l <- between (1, 20)
+    l <- range (1, 20)
     replicateM l alpha
 
   q <- distinct k $ do
-    l <- between (1, 11)
+    l <- range (1, 11)
     replicateM l digit
 
   apm <- forM q $ \p -> do
-    (, p, ) <$> element s <*> between (1, 10_000)
+    (, p, ) <$> element s <*> range (1, 10_000)
 
   return Sample{..}
 
