@@ -21,15 +21,14 @@ shuffle v = do
   i <- G.shuffle [0 .. V.length v - 1]
   return $ V.fromList ((v !) <$> i)
 
--- Vectorの中から適当にひとつ選ぶ
+-- Vector の中から適当にひとつ選ぶ
 element :: RandomGen g => Vector a -> State g a
 element a = do
   i <- G.range (0, length a - 1)
   return $ a ! i
 
--- 今は思いつかないので fromList
 -- 全ての要素が互いに異なるリストの生成器を作るコンビネータ
--- リストを生成しながら要素判定を行う
+-- 今は思いつかないので fromList
 -- 計算量不明
 distinct :: (Ord a, RandomGen g)
          => Int
